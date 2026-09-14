@@ -1,27 +1,79 @@
-# PacienteApp
+# PacienteApp (Frontend Angular)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.16.
+Resumo curto
+- Aplicação frontend Angular 16 para cadastro e edição de pacientes.
+- UI: Angular Material, formulários reativos, máscaras via ngx-mask.
+- Comunicação com API em https://localhost:7137/ via Axios.
 
-## Development server
+Instalação (local)
+1. Clone o repositório:
+   git clone https://github.com/DaniloBR1985/paciente-app.git
+   cd paciente-app
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+2. Instale dependências:
+   npm install
 
-## Code scaffolding
+3. Execute em modo desenvolvimento:
+   npm start
+   - Abre em: http://localhost:4200
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+4. Build para produção:
+   npm run build
 
-## Build
+Configuração da API
+- URL da API configurada em:
+  - `src/environments/environment.ts` (dev)
+  - `src/environments/environment.prod.ts` (prod)
+- Padrão atual: `https://localhost:7137`
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Se o backend estiver em outra origem, atualize os arquivos acima.
 
-## Running unit tests
+CORS e HTTPS (problemas comuns)
+- Se o navegador bloquear chamadas para `https://localhost:7137` por CORS, habilite CORS no backend (ex.: API .NET). Exemplo mínimo para Program.cs (.NET 6+):
+- Program.cs builder.Services.AddCors(opt => { opt.AddPolicy("AllowAngularDev", p => p.WithOrigins("http://localhost:4200") .AllowAnyHeader() .AllowAnyMethod()); });
+app.UseCors("AllowAngularDev");
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+- Se usar certificado de desenvolvimento no Windows, rode:
+  dotnet dev-certs https --trust
 
-## Running end-to-end tests
+Arquitetura (visão geral)
+- Lazy-loaded module por domínio:
+  - `src/app/modules/pacientes/` — módulo lazy com componentes:
+    - `paciente-list` — listagem, inativação, navegação para editar/criar.
+    - `paciente-form` — create/edit, validações e máscaras.
+- Serviços (integração HTTP):
+  - `src/app/services/*.ts` — `paciente.service`, `genero.service`, `convenio.service`
+  - Implementados com Axios (`src/app/core/api.service.ts`) e environment-based baseURL.
+- Models / DTOs:
+  - `src/app/models/*.ts` — interfaces para Dtos (Paciente, Genero, Convenio).
+- Formulários:
+  - Reactive Forms com validações customizadas:
+    - Nome / Sobrenome obrigatórios
+    - Data de nascimento não pode ser futura
+    - Gênero obrigatório
+    - RG + UF do RG obrigatórios e UF validada contra lista de siglas
+    - CPF (opcional): sanitização e validação de dígitos; verificação básica de unicidade no frontend
+    - Pelo menos um telefone válido (mín. 8 dígitos)
+    - Validade da carteirinha: formato MM/YYYY
+- UI:
+  - Angular Material (tabela, formulários, select, snackbar, spinner)
+  - Máscaras com ngx-mask
+- Erros e feedback:
+  - Tratamento central básico de erros no serviço (parse de erro de API)
+  - Mensagens de erro da API são aplicadas nos campos quando possível
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Padrões e boas práticas
+- Separação de camadas: components (UI) ↔ services (API) ↔ models (tipos)
+- Lazy-loading para módulos pesados
+- Environment-based configuration para endpoints
+- Validações no cliente para UX; backend mantém validações finais (unicidade, integridade)
+- Uso de MatSnackBar para feedback consistente
 
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Endpoints usados (exemplos)
+- GET  /api/Pacientes           — lista pacientes
+- GET  /api/Pacientes/{id}      — obter paciente
+- POST /api/Pacientes           — criar paciente
+- PUT  /api/Pacientes/{id}      — atualizar paciente
+- DELETE /api/Pacientes/{id}    — inativar paciente (exclusão lógica)
+- GET  /api/Generos             — lista gêneros
+- GET  /api/Convenios           — lista convênios
