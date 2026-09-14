@@ -1,0 +1,28 @@
+.paciente-list-card {
+  margin: 24px;
+  padding: 16px;
+}
+
+.table-container {
+  overflow: auto;
+  margin-top: 12px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  flex-direction: column;
+}
+
+.empty {
+  color: rgba(0,0,0,0.6);
+  margin-top: 8px;
+}

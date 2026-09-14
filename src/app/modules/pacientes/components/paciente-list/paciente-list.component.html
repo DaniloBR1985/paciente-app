@@ -1,0 +1,72 @@
+<mat-card class="paciente-list-card">
+  <mat-card-title>Pacientes</mat-card-title>
+
+  <div class="actions">
+    <button mat-flat-button color="primary" routerLink="/pacientes/novo">
+      <mat-icon>person_add</mat-icon>&nbsp;Novo paciente
+    </button>
+  </div>
+
+  <!-- expressão segura para comprimento e debug visível (remova depois) -->
+  <div class="table-container" *ngIf="!loading && ((dataSource?.length ?? 0) > 0); else emptyOrLoading">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z2" aria-label="Tabela de pacientes">
+      <!-- colunas... (mantidas) -->
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let row">{{ row.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="sobrenome">
+        <th mat-header-cell *matHeaderCellDef>Sobrenome</th>
+        <td mat-cell *matCellDef="let row">{{ row.sobrenome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="cpf">
+        <th mat-header-cell *matHeaderCellDef>CPF</th>
+        <td mat-cell *matCellDef="let row">{{ row.cpf }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="celular">
+        <th mat-header-cell *matHeaderCellDef>Celular</th>
+        <td mat-cell *matCellDef="let row">{{ row.celular }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="convenioNome">
+        <th mat-header-cell *matHeaderCellDef>Convênio</th>
+        <td mat-cell *matCellDef="let row">{{ row.convenioNome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ativo">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let row">{{ row.ativo ? 'Ativo' : 'Inativo' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let row">
+          <button mat-icon-button color="primary" (click)="onEdit(row.id)" aria-label="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="onInativar(row.id)" aria-label="Inativar">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+
+  <ng-template #emptyOrLoading>
+    <div class="center">
+      <mat-progress-spinner *ngIf="loading" mode="indeterminate"></mat-progress-spinner>
+      <div *ngIf="!loading && ((dataSource?.length ?? 0) === 0)" class="empty">
+        Nenhum paciente encontrado.
+      </div>
+
+      <!-- debug temporário: exibe o JSON retornado (remova depois) -->
+      <pre *ngIf="!loading" style="max-width: 100%; overflow:auto; margin-top:12px;">{{ dataSource | json }}</pre>
+    </div>
+  </ng-template>
+</mat-card>
